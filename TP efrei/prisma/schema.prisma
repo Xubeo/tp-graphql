@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model classes {
+  idClasses   Int        @id @default(autoincrement())
+  nameClasses String     @db.VarChar(50)
+  cours       cours[]
+  students    students[]
+}
+
+model cours {
+  idCours    Int      @id @default(autoincrement())
+  idClasses  Int
+  idTeachers Int
+  idSalles   Int
+  nameCours  String   @db.VarChar(50)
+  classes    classes  @relation(fields: [idClasses], references: [idClasses], onDelete: Cascade, map: "cours_ibfk_1")
+  teachers   teachers @relation(fields: [idTeachers], references: [idTeachers], onDelete: Cascade, map: "cours_ibfk_2")
+  salles     salles   @relation(fields: [idSalles], references: [idSalles], onDelete: Cascade, map: "cours_ibfk_3")
+  notes      notes[]
+
+  @@index([idClasses], map: "idClasses")
+  @@index([idTeachers], map: "idTeachers")
+  @@index([idSalles], map: "idSalles")
+}
+
+model students {
+  idStudents        Int     @id @default(autoincrement())
+  firstNameStudents String  @db.VarChar(50)
+  lastNameStudents  String  @db.VarChar(50)
+  idClasses         Int
+  notes             notes[]
+  classes           classes @relation(fields: [idClasses], references: [idClasses], onDelete: Cascade, map: "students_ibfk_1")
+
+  @@index([idClasses], map: "idClasses")
+}
+
+model teachers {
+  idTeachers        Int     @id @default(autoincrement())
+  firstNameTeachers String  @db.VarChar(50)
+  lastNameTeachers  String  @db.VarChar(50)
+  cours             cours[]
+}
+
+model administration {
+  idAdministration        Int    @id @default(autoincrement())
+  firstNameAdministration String @db.VarChar(50)
+  lastNameAdministration  String @db.VarChar(50)
+}
+
+model notes {
+  idNotes    Int      @id @default(autoincrement())
+  idStudents Int
+  idCours    Int
+  notes      Int
+  students   students @relation(fields: [idStudents], references: [idStudents], onDelete: Cascade, map: "notes_ibfk_1")
+  cours      cours    @relation(fields: [idCours], references: [idCours], onDelete: Cascade, map: "notes_ibfk_2")
+
+  @@index([idStudents], map: "idStudents")
+  @@index([idCours], map: "idCours")
+}
+
+model salles {
+  idSalles    Int     @id @default(autoincrement())
+  numeroSalle Int
+  cours       cours[]
+}
